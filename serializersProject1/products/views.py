@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from products.models import Product
+from products.serializers import ProductSerializer
+from rest_framework.response import Response
 
 
 # 상품 등록, 목록 조회
@@ -11,7 +14,10 @@ class ProductView(APIView):
 
     # 상품 목록 조회
     def get(self, request):
-        pass
+        # Product 모델에 있는 모든걸 가져온다.
+        products = Product.objects.all()
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
     # 상품 등록
     def post(self, request):
