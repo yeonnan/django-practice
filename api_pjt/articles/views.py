@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.core import serializers
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Article
+from .serializers import ArticleSerializer
 
 
 def article_list_html(request):
@@ -34,3 +37,14 @@ def json_02(request):
     res_data = serializers.serialize('json', articles)
     # content_type : Response 구조 중에 정보로 들어있다.
     return HttpResponse(res_data, content_type='application/json')
+
+
+@ api_view(['GET'])
+def json_drf(request):
+    # 1. 데이터를 다 가져온 후
+    articles = Article.objects.all()
+    # 2. 정의해둔 ArticleSerializer를 기져온다.
+    # 조회한 queryset(articles)을 그대로 넣어주는데, queryset이 단일 객체이면 many=True를 빼둬된다.
+    # 지금은 all -> 여러개이기 때문에 many=True를 넣어줘야 한다.
+    serializer = ArticleSerializer(articles, many=True)
+    return Response(serializer.data)
