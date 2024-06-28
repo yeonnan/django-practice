@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Article
 from .serializers import ArticleSerializer
+from django.shortcuts import get_object_or_404
 
 
 def article_list_html(request):
@@ -40,11 +41,25 @@ def json_02(request):
 
 
 @ api_view(['GET'])
-def json_drf(request):
+def article_list(request):
     # 1. 데이터를 다 가져온 후
     articles = Article.objects.all()
     # 2. 정의해둔 ArticleSerializer를 기져온다.
     # 조회한 queryset(articles)을 그대로 넣어주는데, queryset이 단일 객체이면 many=True를 빼둬된다.
     # 지금은 all -> 여러개이기 때문에 many=True를 넣어줘야 한다.
     serializer = ArticleSerializer(articles, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def article_detail(request, pk):
+    # 1. pk에 해당하는 article 조회
+    # 2. article 객체를 넘길 수 없으니까 serialization 하고
+    # 3. return
+
+    # Article.objects.get으로 했을 때 pk가 9999가 들어오면 서버가 터지게 된다. 그래서 get_object_or_404으로 해준다. 
+    # article = Article.objects.get(id=pk)
+    article = get_object_or_404(Article, pk=pk)
+    # 단일 데이터이기 때문에 many=True가 필요 없다.
+    serializer = ArticleSerializer(article)
     return Response(serializer.data)
