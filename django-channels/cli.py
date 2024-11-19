@@ -98,6 +98,7 @@ def say(message : str, lang : str) -> None:
 def main():
     assistant_message = gpt_query(USER_PROMPT)
     print(f'[assistant] {assistant_message}')
+    say(assistant_message, 'en')
 
     while line := input('[user] ').strip():
         if line == '!recommend':
@@ -108,6 +109,7 @@ def main():
         else:
             response = gpt_query(line)
             print(f'[assistant] {response}')
+            say(response, 'en')
 
 
 # cli.py 파일을 시작으로 파이썬 프로그램이 구동되면 main 함수가 호출
