@@ -25,6 +25,7 @@ SYSTEM_PROMPT = (
     f'is {level_string}. And please write only the sentence without'
     f'the character role.'
 )
+
 USER_PROMPT = (
     f"Let's have a conversation in {language}. Please answer in {language} only "
     f"without providing a translation. And please don't write down the "
@@ -35,14 +36,21 @@ USER_PROMPT = (
     f"Now, start a conversation with the first sentence!"
 )
 
+RECOMMEND_PROMPT = (
+    f"Can you please provide me an {level_word} example"
+    f"of how to respond to the last sentence"
+    f"in this situation, without providing a translation"
+    f"and any introductory phrases or sentences."
+)
+
+
 # 대화 내역 누적 리스트
 message = [
     {'role' : 'system', 'content' : SYSTEM_PROMPT} 
 ]
 
 
-
-def gpt_query(user_query : str) -> str:
+def gpt_query(user_query : str, skip_save : bool = False) -> str:
     '유저 메세지에 대한 응답을 반환합니다.'
 
     global message
@@ -58,10 +66,11 @@ def gpt_query(user_query : str) -> str:
     )
     assistant_message = response['choices'][0]['message']['content']
 
-    message.append({
-        'role' : 'assistant',
-        'content' : assistant_message,
-    })
+    if skip_save is False:
+        message.append({
+            'role' : 'assistant',
+            'content' : assistant_message,
+        })
 
     return assistant_message
 
@@ -75,6 +84,7 @@ def play_file(file_path : str) -> None:
         pass
 
     pygame.mixer.quit()
+
 
 def say(message : str, lang : str) -> None:
     io = BytesIO()
@@ -90,7 +100,10 @@ def main():
     print(f'[assistant] {assistant_message}')
 
     while line := input('[user] ').strip():
-        if line == '!say':
+        if line == '!recommend':
+            recommend_message = gpt_query(RECOMMEND_PROMPT, skip_save=True)
+            print('추천 표현 : ', recommend_message)
+        elif line == '!say':
             say(message[-1]['content'], 'en')
         else:
             response = gpt_query(line)
