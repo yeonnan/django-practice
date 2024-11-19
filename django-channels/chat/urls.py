@@ -3,5 +3,5 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.Main.as_view(), name='main'),
+    path('new/', views.role_playing_room_new, name='role_playing_room_new'),
 ]

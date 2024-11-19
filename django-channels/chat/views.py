@@ -1,7 +1,19 @@
 from django.shortcuts import render
-from django.views import View
+from django.views.generic import CreateView
+from .models import RolePlayingRoom
+from .forms import RolePlayingRoomForm
+from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
 
 
-class Main(View):
-    def get(self, request):
-        return render(request=request, template_name='chat/main.html')
+@method_decorator(staff_member_required, name="dispatch")
+class RolePlayingRoomCreateView(CreateView):
+    model = RolePlayingRoom
+    form_class = RolePlayingRoomForm
+
+    def form_valid(self, form):
+        role_playing_room = form.save(commit=False)
+        role_playing_room.user = self.request.user
+        return super().form_valid(form)
+
+role_playing_room_new = RolePlayingRoomCreateView.as_view()
